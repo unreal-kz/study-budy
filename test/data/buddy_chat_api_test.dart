@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -6,6 +7,24 @@ import 'package:http/testing.dart';
 import 'package:study_budy/data/buddy_chat_api.dart';
 
 void main() {
+  test('defaultTimeout covers Render cold start (ADR 0001: 30-60s)', () {
+    expect(BuddyChatApi.defaultTimeout, greaterThanOrEqualTo(const Duration(seconds: 60)));
+  });
+
+  test('sendMessage throws BuddyChatException when the request exceeds its timeout', () async {
+    final mockClient = MockClient((request) => Completer<http.Response>().future);
+    final api = BuddyChatApi(
+      baseUrl: 'http://localhost:8000',
+      timeout: const Duration(milliseconds: 50),
+      client: mockClient,
+    );
+
+    expect(
+      () => api.sendMessage(history: const [], message: 'Hi', level: 'B1'),
+      throwsA(isA<BuddyChatException>()),
+    );
+  });
+
   test('sendMessage returns a parsed BuddyReply on 200', () async {
     final mockClient = MockClient((request) async {
       expect(request.url.path, '/buddy/chat');

@@ -28,11 +28,20 @@ class BuddyChatException implements Exception {
 }
 
 class BuddyChatApi {
-  BuddyChatApi({required this.baseUrl, this.appToken = '', http.Client? client})
-      : _client = client ?? http.Client();
+  BuddyChatApi({
+    required this.baseUrl,
+    this.appToken = '',
+    this.timeout = defaultTimeout,
+    http.Client? client,
+  }) : _client = client ?? http.Client();
+
+  // Render free-tier cold start is 30-60s (docs/adr/0001-backend-hosting.md)
+  // on top of up to 30s the server itself waits on OpenRouter.
+  static const defaultTimeout = Duration(seconds: 90);
 
   final String baseUrl;
   final String appToken;
+  final Duration timeout;
   final http.Client _client;
 
   Future<BuddyReply> sendMessage({
@@ -62,7 +71,7 @@ class BuddyChatApi {
             },
             body: body,
           )
-          .timeout(const Duration(seconds: 30));
+          .timeout(timeout);
     } catch (_) {
       throw BuddyChatException("Can't reach your practice partner right now.");
     }

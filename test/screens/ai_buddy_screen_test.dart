@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +10,22 @@ import 'package:study_budy/data/progress_repository.dart';
 import 'package:study_budy/screens/ai_buddy/ai_buddy_screen.dart';
 import 'package:study_budy/state/chat_provider.dart';
 import 'package:study_budy/state/progress_provider.dart';
+
+/// Lets a test control exactly when sendMessage resolves, to inspect the
+/// pending UI (e.g. simulating a slow Render cold start).
+class _PendingApi extends BuddyChatApi {
+  _PendingApi() : super(baseUrl: 'http://unused');
+
+  final completer = Completer<BuddyReply>();
+
+  @override
+  Future<BuddyReply> sendMessage({
+    required List history,
+    required String message,
+    required String level,
+  }) =>
+      completer.future;
+}
 
 class _ScriptedApi extends BuddyChatApi {
   _ScriptedApi(this._reply) : super(baseUrl: 'http://unused');
@@ -109,6 +127,26 @@ void main() {
     // Chat mode shows the full history.
     expect(find.text('First message'), findsOneWidget);
     expect(find.text('Second message'), findsOneWidget);
+  });
+
+  testWidgets('a pending reply shows the loading indicator and disables send', (tester) async {
+    final api = _PendingApi();
+    await _pumpAiBuddy(tester, api);
+
+    await tester.enterText(find.byKey(const Key('ai_buddy_input')), 'Hi');
+    await tester.tap(find.byKey(const Key('ai_buddy_send')));
+    await tester.pump();
+
+    expect(find.byKey(const Key('ai_buddy_sending')), findsOneWidget);
+    final sendButton = tester.widget<IconButton>(find.byKey(const Key('ai_buddy_send')));
+    expect(sendButton.onPressed, isNull);
+
+    api.completer.complete(const BuddyReply(reply: 'Hi!'));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('ai_buddy_sending')), findsNothing);
+    final sendButtonAfter = tester.widget<IconButton>(find.byKey(const Key('ai_buddy_send')));
+    expect(sendButtonAfter.onPressed, isNotNull);
   });
 
   testWidgets('the start-conversation icon is present but disabled', (tester) async {
