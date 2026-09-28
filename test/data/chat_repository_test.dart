@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:study_budy/data/chat_repository.dart';
@@ -25,5 +27,17 @@ void main() {
     ));
     final messages = await repo.loadAll();
     expect(messages.map((m) => m.id).toList(), ['1', '2']);
+  });
+
+  test('loadAll() skips a corrupted entry but keeps the valid ones', () async {
+    SharedPreferences.setMockInitialValues({
+      'chat_messages': ['not valid json', jsonEncode(ChatMessage(
+        id: '1', sender: 'user', text: 'Hi', createdAt: DateTime.utc(2026, 1, 1),
+      ).toJson())],
+    });
+    final repo = ChatRepository();
+    final messages = await repo.loadAll();
+    expect(messages, hasLength(1));
+    expect(messages.first.id, '1');
   });
 }

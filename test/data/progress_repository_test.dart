@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:study_budy/data/progress_repository.dart';
+import 'package:study_budy/models/progress_entry.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -49,5 +52,15 @@ void main() {
     await repo.recordSession(date: '2026-09-28', newWords: 1);
     final streak = await repo.currentStreak(today: DateTime(2026, 9, 28));
     expect(streak, 2); // only the 27th and 28th, the 24th is across the gap
+  });
+
+  test('loadAll() skips a corrupted entry but keeps the valid ones', () async {
+    SharedPreferences.setMockInitialValues({
+      'progress_daily': ['not valid json', jsonEncode(const ProgressEntry(date: '2026-09-28', newWords: 2).toJson())],
+    });
+    final repo = ProgressRepository();
+    final entries = await repo.loadAll();
+    expect(entries, hasLength(1));
+    expect(entries.first.date, '2026-09-28');
   });
 }

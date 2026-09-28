@@ -24,4 +24,12 @@ void main() {
     expect(profile.level, 'B1');
     expect(profile.onboardingComplete, true);
   });
+
+  test('load() falls back to Profile.empty when stored data is corrupted', () async {
+    SharedPreferences.setMockInitialValues({'profile': 'not valid json'});
+    final repo = ProfileRepository();
+    final profile = await repo.load();
+    expect(profile.onboardingComplete, false);
+    expect(profile.name, '');
+  });
 }

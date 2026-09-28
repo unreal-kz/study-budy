@@ -10,9 +10,15 @@ class ChatRepository {
   Future<List<ChatMessage>> loadAll() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getStringList(_key) ?? const <String>[];
-    return raw
-        .map((s) => ChatMessage.fromJson(jsonDecode(s) as Map<String, dynamic>))
-        .toList();
+    final messages = <ChatMessage>[];
+    for (final s in raw) {
+      try {
+        messages.add(ChatMessage.fromJson(jsonDecode(s) as Map<String, dynamic>));
+      } catch (_) {
+        // Skip a corrupted entry rather than losing/crashing the whole list.
+      }
+    }
+    return messages;
   }
 
   Future<void> add(ChatMessage message) async {

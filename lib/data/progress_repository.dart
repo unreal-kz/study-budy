@@ -10,9 +10,15 @@ class ProgressRepository {
   Future<List<ProgressEntry>> loadAll() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getStringList(_key) ?? const <String>[];
-    return raw
-        .map((s) => ProgressEntry.fromJson(jsonDecode(s) as Map<String, dynamic>))
-        .toList();
+    final entries = <ProgressEntry>[];
+    for (final s in raw) {
+      try {
+        entries.add(ProgressEntry.fromJson(jsonDecode(s) as Map<String, dynamic>));
+      } catch (_) {
+        // Skip a corrupted entry rather than losing/crashing the whole list.
+      }
+    }
+    return entries;
   }
 
   Future<void> recordSession({

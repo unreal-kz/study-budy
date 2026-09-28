@@ -11,7 +11,11 @@ class ProfileRepository {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_key);
     if (raw == null) return Profile.empty;
-    return Profile.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    try {
+      return Profile.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    } catch (_) {
+      return Profile.empty;
+    }
   }
 
   Future<void> save(Profile profile) async {
