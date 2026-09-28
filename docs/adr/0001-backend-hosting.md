@@ -23,8 +23,8 @@
 
 - Без карты — минимальный порог входа для беты.
 - 750 instance-hours/мес с запасом покрывает низкий трафик одного пользователя.
-- Секреты — через Render Dashboard → Environment (`OPENROUTER_API_KEY`), не коммитятся.
-- Деплой — подключение GitHub-репозитория, авто-деплой на push в `main` (или отдельная ветка/`render.yaml`, уточняется в ST-29).
+- Секреты — через Render Dashboard → Environment (`OPENROUTER_API_KEY`, `APP_TOKEN`), не коммитятся.
+- Деплой — `render.yaml` (Blueprint) в корне репозитория, `autoDeployTrigger: checksPass` (деплой на push в `main` только после зелёного CI). Решено в ST-29.
 
 ## Последствия
 
