@@ -11,6 +11,12 @@ from app.openrouter_client import (
 )
 
 
+@pytest.fixture(autouse=True)
+def _fake_api_key(monkeypatch):
+    """Provide a dummy OPENROUTER_API_KEY for tests (not needed for production)."""
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key-not-real")
+
+
 def _fake_response(status_code: int, content: str | None = None, text: str = ""):
     response = MagicMock()
     response.status_code = status_code
