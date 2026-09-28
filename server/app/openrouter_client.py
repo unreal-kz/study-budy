@@ -4,7 +4,7 @@ import os
 import httpx
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-MODEL = "google/gemma-4-31b-it:free"
+MODEL = "nvidia/nemotron-3-super-120b-a12b:free"
 
 BUDDY_REPLY_SCHEMA = {
     "type": "object",

@@ -85,31 +85,53 @@ Find a Buddy and Community are **read-only JSON fixtures** bundled as
 Flutter assets (`assets/seed/buddies.json`, `assets/seed/community.json`),
 loaded into memory at startup — no backend involvement.
 
-## Model choice: `google/gemma-4-31b-it:free` via OpenRouter
+## Model choice: `nvidia/nemotron-3-super-120b-a12b:free` via OpenRouter
 
-Evaluated against the $0 budget constraint (confirmed live via OpenRouter's
-public models API, `https://openrouter.ai/api/v1/models`, and OpenRouter's
-own rate-limit docs, both fetched 2026-09-28 — not from secondhand sources):
+**Update 2026-09-28 (post-MVP, during Beta E2E):** the original choice,
+`google/gemma-4-31b-it:free`, was swapped out same-day after the ST-24
+manual E2E hit **consistent 429s** with body
+`limit_source: upstream_provider_shared_pool` — a provider-side (Google AI
+Studio) shared free-pool overload, not our own 50/day ceiling, confirmed
+via direct curl against the OpenRouter API with a brand-new $0-spend key.
+Retried after a 15-minute wait; got worse, not better — not a short blip.
+Full findings in Linear issue ST-32.
 
-- `google/gemma-4-31b-it:free` — 31B dense, 256K context, `$0`/`$0`,
-  supports `response_format` and `tools` per its OpenRouter model metadata.
+Live-tested against `https://openrouter.ai/api/v1/models` on the same day:
+of 6 free models supporting `response_format`/structured output, both
+`google/*` ones (Google AI Studio backend) 429'd; all 4 non-Google-AI-Studio
+ones (`qwen/qwen3.8-27b:free`, `dots-studio/dots-3-note-preview:free`,
+`liquid/lfm-2.5-2.6b:free`, `nvidia/nemotron-3-super-120b-a12b:free`)
+answered immediately. Picked `nvidia/nemotron-3-super-120b-a12b:free`:
+120B, 262K context, established provider (vs. `dots-studio`'s "preview"
+naming, a stability red flag beyond the general free-tier risk below);
+4/4 repeat calls with the app's exact payload (system prompt +
+`response_format: json_schema`) returned 200 with correct, well-formed
+grammar corrections.
+
+Original evaluation (still applies to the new model — same $0 constraint,
+same OpenRouter free-tier terms):
+
 - Free-tier rate limits (OpenRouter docs): 20 req/min always; 50 req/day at
   $0 lifetime spend (we're staying at $0, so 50/day is the real ceiling) —
-  ample for a single demo account.
+  ample for a single demo account. (Separate from the provider-side shared-
+  pool issue above, which is per-model/per-provider, not per-account.)
 - Risk, stated plainly: free models "may be removed or have limits adjusted
-  without notice" (OpenRouter's own wording). Acceptable for a pet project;
-  revisit if it happens.
+  without notice" (OpenRouter's own wording) — the Google AI Studio pool
+  issue above is exactly this risk materializing, sooner than expected.
+  Acceptable for a pet project; revisit again if it happens to this model.
 - Structured-output reliability is **not guaranteed the way Anthropic's
   `output_config.format` is** — open-weight models via OpenRouter are less
   consistent at strict JSON adherence. The backend must validate and
   gracefully degrade (see Error handling), not assume clean JSON always
   arrives.
 
-Alternative considered: Google AI Studio direct (Gemini Flash / Gemma, also
-free). Rejected for this project because free-tier rate limits are no
-longer published (per-project only, checked in the AI Studio console) and
-Google's own free-tier terms allow using request data to improve their
-products — OpenRouter's limits are transparent and documented.
+Alternative considered (original evaluation): Google AI Studio direct
+(Gemini Flash / Gemma, also free). Rejected for this project because
+free-tier rate limits are no longer published (per-project only, checked
+in the AI Studio console) and Google's own free-tier terms allow using
+request data to improve their products — OpenRouter's limits are
+transparent and documented. Still holds — the Beta swap moved to a
+different free model on OpenRouter, not to a different provider.
 
 ## Data model (local storage)
 
