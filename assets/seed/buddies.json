@@ -1,0 +1,7 @@
+[
+  {"id": "kausar", "name": "Kausar", "level": "B1", "city": "Almaty", "interests": ["Movies", "Travel"]},
+  {"id": "daniyar", "name": "Daniyar", "level": "A2", "city": "Astana", "interests": ["Sports", "Music"]},
+  {"id": "aruzhan", "name": "Aruzhan", "level": "B1", "city": "Shymkent", "interests": ["Culture", "Cooking"]},
+  {"id": "alan", "name": "Alan", "level": "B2", "city": "Karaganda", "interests": ["Technology", "Science"]},
+  {"id": "malika", "name": "Malika", "level": "A2", "city": "Aktobe", "interests": ["Art", "Animals"]}
+]
