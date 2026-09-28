@@ -1,0 +1,7 @@
+[
+  {"sender": "buddy", "text": "Hi! How was your day?"},
+  {"sender": "me", "text": "It was good! I went to the library today. What about you?"},
+  {"sender": "buddy", "text": "Nice! I also studied for my test. Do you want to practice speaking later?"},
+  {"sender": "me", "text": "Sure! Let's do a 10-minute call at 5?"},
+  {"sender": "buddy", "text": "Perfect! See you then!"}
+]

@@ -1,0 +1,7 @@
+[
+  {"id": "movies", "name": "Movies & TV Shows", "memberCount": 1200, "description": "Talk about your favourite films!"},
+  {"id": "travel", "name": "Travel & Culture", "memberCount": 980, "description": "Share your experience and learn!"},
+  {"id": "study-tips", "name": "Study Tips", "memberCount": 1500, "description": "Help each other and stay motivated!"},
+  {"id": "games", "name": "Games & Hobbies", "memberCount": 670, "description": "Play, learn and make friends!"},
+  {"id": "speaking-club", "name": "Speaking Club", "memberCount": 2000, "description": "Weekly voice chats and activities!"}
+]
