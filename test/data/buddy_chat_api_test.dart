@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:study_budy/data/buddy_chat_api.dart';
-import 'package:study_budy/models/chat_message.dart';
 
 void main() {
   test('sendMessage returns a parsed BuddyReply on 200', () async {
