@@ -51,5 +51,9 @@ Issue переводится в **Done** только когда:
 
 ## Текущее состояние на 2026-09-28
 
-- Все 16 задач `docs/superpowers/plans/2026-09-28-study-buddy-mvp.md` реализованы и заведены в Linear как **Done** (ST-5…ST-20) — трассируемость по коду, не блокеры.
-- Единственный открытый issue проекта: **ST-21 — Merge `worktree-study-buddy-mvp` в `main`** (29 коммитов, ждёт финального вердикта ревью).
+- MVP (`Study Buddy — MVP` project) — **Completed**: все 16 задач плана и мердж в `main` (ST-5…ST-21) сделаны, ветка `worktree-study-buddy-mvp` влита через PR #18.
+- Активный project: **`Study Buddy — Beta (Daryn)`** — довести приложение до телефона Дарына без зависимости от Mac Баубека.
+  - Housekeeping (Kanban, без цикла): ST-22 (sync main), ST-23 (чистка висячего worktree), ST-24 (ручной E2E).
+  - Cycle 1 (2026-10-04 → 10-11): ST-26 (CI), ST-27 (spike: выбор $0-хостинга), ST-28 (защита `/buddy/chat`), ST-29 (деплой, блокируется ST-27+ST-28), ST-30 (релизный APK, блокируется ST-29).
+  - Cycle 2 (2026-10-11 → 10-18): ST-31 (голос для AI Buddy — brainstorm + spec).
+  - Backlog без цикла: ST-25 (реальный multi-user backend) — сознательно не в скоупе.
