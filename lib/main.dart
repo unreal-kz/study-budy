@@ -29,25 +29,28 @@ class StudyBudyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProfileProvider(ProfileRepository())..load()),
         ChangeNotifierProvider(create: (_) => ProgressProvider(ProgressRepository())..load()),
       ],
-      child: Consumer2<ProfileProvider, ProgressProvider>(
-        builder: (context, profileProvider, progressProvider, _) {
-          return ChangeNotifierProvider(
-            key: ValueKey(profileProvider.profile.level),
-            create: (_) => ChatProvider(
-              repository: ChatRepository(),
-              api: BuddyChatApi(baseUrl: backendBaseUrl),
-              progressProvider: progressProvider,
-              level: profileProvider.profile.level,
-            )..load(),
-            child: Builder(
-              builder: (context) {
-                final router = buildRouter(profileProvider);
-                return MaterialApp.router(
+      child: Builder(
+        builder: (context) {
+          // Built once: go_router's own `refreshListenable` handles redirect
+          // reactivity, so the router must not be reconstructed on every
+          // provider rebuild (that would reset navigation to initialLocation).
+          final router = buildRouter(context.read<ProfileProvider>());
+          return Consumer2<ProfileProvider, ProgressProvider>(
+            builder: (context, profileProvider, progressProvider, _) {
+              return ChangeNotifierProvider(
+                key: ValueKey(profileProvider.profile.level),
+                create: (_) => ChatProvider(
+                  repository: ChatRepository(),
+                  api: BuddyChatApi(baseUrl: backendBaseUrl),
+                  progressProvider: progressProvider,
+                  level: profileProvider.profile.level,
+                )..load(),
+                child: MaterialApp.router(
                   title: 'Study Buddy',
                   routerConfig: router,
-                );
-              },
-            ),
+                ),
+              );
+            },
           );
         },
       ),
