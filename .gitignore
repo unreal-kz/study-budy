@@ -50,6 +50,7 @@ app.*.map.json
 # Secrets / local env
 .env
 .env.*
+.app_token.txt
 .remember/
 .claude/settings.local.json
 
