@@ -44,6 +44,8 @@ flutter run -d chrome --dart-define=BACKEND_BASE_URL=https://your-host --dart-de
 
 The backend deploys from `render.yaml` (Blueprint) on the free web service tier — see `docs/adr/0001-backend-hosting.md` for why. Auto-deploy runs on every push to `main` that passes CI (`autoDeployTrigger: checksPass`).
 
+Prod URL: `https://study-buddy-server-pudn.onrender.com` (verified: `/health` public, `/buddy/chat` requires `X-App-Token`).
+
 First-time setup (Render dashboard, not repo-tracked): New → Blueprint → connect the `unreal-kz/study-budy` GitHub repo. Render prompts for `OPENROUTER_API_KEY` and `APP_TOKEN` at that point (`sync: false` in `render.yaml`) — after the initial Blueprint creation, Render no longer prompts for new `sync: false` values, so rotating either one means editing it directly in the service's Environment tab.
 
 Rotating `APP_TOKEN` also requires rebuilding the Flutter app with the new `--dart-define=APP_TOKEN=...` (see ST-30) — the old token stops working the moment the env var changes.
