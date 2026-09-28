@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../data/seed_repository.dart';
 import '../../models/buddy.dart';
+import '../../widgets/buddy_card.dart';
 
 class FindABuddyScreen extends StatefulWidget {
   const FindABuddyScreen({super.key});
@@ -29,23 +30,20 @@ class _FindABuddyScreenState extends State<FindABuddyScreen> {
         builder: (context, snapshot) {
           if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
           final buddies = snapshot.data!;
-          return ListView.builder(
+          return ListView.separated(
+            padding: const EdgeInsets.all(20),
             itemCount: buddies.length,
+            separatorBuilder: (_, _) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final buddy = buddies[index];
-              return ListTile(
-                title: Text(buddy.name),
-                subtitle: Text('${buddy.level} · ${buddy.city}'),
+              return BuddyCard(
+                buddy: buddy,
                 onTap: () => context.push('/buddy-chat/${buddy.id}'),
-                trailing: TextButton(
-                  key: Key('connect_${buddy.id}'),
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Connect request sent to ${buddy.name}!')),
-                    );
-                  },
-                  child: const Text('Connect'),
-                ),
+                onConnect: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Connect request sent to ${buddy.name}!')),
+                  );
+                },
               );
             },
           );

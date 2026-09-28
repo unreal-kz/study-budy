@@ -9,6 +9,7 @@ import 'router/app_router.dart';
 import 'state/chat_provider.dart';
 import 'state/profile_provider.dart';
 import 'state/progress_provider.dart';
+import 'theme/app_theme.dart';
 
 const backendBaseUrl = String.fromEnvironment(
   'BACKEND_BASE_URL',
@@ -47,6 +48,7 @@ class StudyBudyApp extends StatelessWidget {
                 )..load(),
                 child: MaterialApp.router(
                   title: 'Study Buddy',
+                  theme: AppTheme.light,
                   routerConfig: router,
                 ),
               );

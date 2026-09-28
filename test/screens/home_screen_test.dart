@@ -3,8 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:study_budy/data/challenges.dart';
+import 'package:study_budy/data/profile_repository.dart';
 import 'package:study_budy/data/progress_repository.dart';
 import 'package:study_budy/screens/home/home_screen.dart';
+import 'package:study_budy/state/profile_provider.dart';
 import 'package:study_budy/state/progress_provider.dart';
 
 void main() {
@@ -20,10 +22,15 @@ void main() {
   testWidgets('renders streak and today\'s challenge', (tester) async {
     final progressProvider = ProgressProvider(ProgressRepository());
     await progressProvider.load();
+    final profileProvider = ProfileProvider(ProfileRepository());
+    await profileProvider.load();
 
     await tester.pumpWidget(
-      ChangeNotifierProvider.value(
-        value: progressProvider,
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: progressProvider),
+          ChangeNotifierProvider.value(value: profileProvider),
+        ],
         child: const MaterialApp(home: HomeScreen()),
       ),
     );

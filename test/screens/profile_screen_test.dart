@@ -4,8 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:study_budy/data/profile_repository.dart';
+import 'package:study_budy/data/progress_repository.dart';
 import 'package:study_budy/screens/profile/profile_screen.dart';
 import 'package:study_budy/state/profile_provider.dart';
+import 'package:study_budy/state/progress_provider.dart';
 
 void main() {
   setUp(() {
@@ -16,10 +18,15 @@ void main() {
     final provider = ProfileProvider(ProfileRepository());
     await provider.load();
     await provider.completeOnboarding(name: 'Daryn', level: 'B1');
+    final progressProvider = ProgressProvider(ProgressRepository());
+    await progressProvider.load();
 
     await tester.pumpWidget(
-      ChangeNotifierProvider.value(
-        value: provider,
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: provider),
+          ChangeNotifierProvider.value(value: progressProvider),
+        ],
         child: const MaterialApp(home: ProfileScreen()),
       ),
     );

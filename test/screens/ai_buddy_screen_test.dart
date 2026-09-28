@@ -87,4 +87,35 @@ void main() {
     expect(find.byKey(const Key('ai_buddy_error')), findsOneWidget);
     expect(find.text('Hi'), findsOneWidget); // the user's message is still shown
   });
+
+  testWidgets('Feedback mode shows only the latest exchange; Chat mode shows full history',
+      (tester) async {
+    await _pumpAiBuddy(tester, _ScriptedApi(const BuddyReply(reply: 'Got it!')));
+
+    await tester.enterText(find.byKey(const Key('ai_buddy_input')), 'First message');
+    await tester.tap(find.byKey(const Key('ai_buddy_send')));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('ai_buddy_input')), 'Second message');
+    await tester.tap(find.byKey(const Key('ai_buddy_send')));
+    await tester.pumpAndSettle();
+
+    // Default mode is Feedback: only the latest exchange is visible.
+    expect(find.text('Second message'), findsOneWidget);
+    expect(find.text('First message'), findsNothing);
+
+    await tester.tap(find.byKey(const Key('ai_buddy_mode_toggle')));
+    await tester.pumpAndSettle();
+
+    // Chat mode shows the full history.
+    expect(find.text('First message'), findsOneWidget);
+    expect(find.text('Second message'), findsOneWidget);
+  });
+
+  testWidgets('the start-conversation icon is present but disabled', (tester) async {
+    await _pumpAiBuddy(tester, _ScriptedApi(const BuddyReply(reply: 'Hi!')));
+
+    final button = tester.widget<IconButton>(find.byKey(const Key('ai_buddy_start_conversation')));
+    expect(button.onPressed, isNull);
+    expect(button.tooltip, 'Voice conversation — coming soon');
+  });
 }

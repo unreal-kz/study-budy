@@ -24,7 +24,8 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify that the onboarding screen is shown
-    expect(find.text('Welcome to Study Buddy'), findsOneWidget);
+    expect(find.text('Study Buddy'), findsOneWidget);
+    expect(find.byKey(const Key('onboarding_name')), findsOneWidget);
   });
 
   testWidgets('progress updates do not reset navigation to Home', (WidgetTester tester) async {

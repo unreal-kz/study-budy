@@ -26,7 +26,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Welcome to Study Buddy'), findsOneWidget);
+    expect(find.text('Study Buddy'), findsOneWidget);
+    expect(find.byKey(const Key('onboarding_name')), findsOneWidget);
   });
 
   testWidgets('shows Home once onboarding completes', (tester) async {
