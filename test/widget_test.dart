@@ -47,6 +47,13 @@ void main() {
     await progressProvider.recordSession(newWords: 1);
     await tester.pumpAndSettle();
 
-    expect(find.text('Community'), findsWidgets);
+    expect(
+      find.descendant(of: find.byType(AppBar), matching: find.text('Community')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: find.byType(AppBar), matching: find.text('Home')),
+      findsNothing,
+    );
   });
 }
