@@ -50,6 +50,8 @@ First-time setup (Render dashboard, not repo-tracked): New → Blueprint → con
 
 Rotating `APP_TOKEN` also requires rebuilding the Flutter app with the new `--dart-define=APP_TOKEN=...` (see ST-30) — the old token stops working the moment the env var changes.
 
+Prod also sets `REQUIRE_APP_TOKEN=1` (`render.yaml`), so a startup with `APP_TOKEN` unset or blank fails the deploy instead of silently reopening `/buddy/chat` with no auth (ST-37); local dev leaves it unset and keeps the fail-open default.
+
 Free tier spins down after 15 min idle; the first request after that takes 30-60s (cold start).
 
 ## Checks
