@@ -52,3 +52,10 @@ app.*.map.json
 .env.*
 .remember/
 .claude/settings.local.json
+
+# Python backend (server/)
+server/.venv/
+server/__pycache__/
+server/**/__pycache__/
+server/.pytest_cache/
+server/.env
