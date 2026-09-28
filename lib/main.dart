@@ -16,6 +16,10 @@ const backendBaseUrl = String.fromEnvironment(
   defaultValue: 'http://localhost:8000',
 );
 
+// Empty by default -> no X-App-Token header sent, matching the backend's
+// unauthenticated local-dev default (see server/.env.example APP_TOKEN).
+const appToken = String.fromEnvironment('APP_TOKEN', defaultValue: '');
+
 void main() {
   runApp(const StudyBudyApp());
 }
@@ -42,7 +46,7 @@ class StudyBudyApp extends StatelessWidget {
                 key: ValueKey(profileProvider.profile.level),
                 create: (_) => ChatProvider(
                   repository: ChatRepository(),
-                  api: BuddyChatApi(baseUrl: backendBaseUrl),
+                  api: BuddyChatApi(baseUrl: backendBaseUrl, appToken: appToken),
                   progressProvider: progressProvider,
                   level: profileProvider.profile.level,
                 )..load(),
