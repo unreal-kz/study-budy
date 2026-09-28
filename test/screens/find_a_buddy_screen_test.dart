@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:study_budy/screens/find_a_buddy/find_a_buddy_screen.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  // Prevents rootBundle's asset string cache from holding a Future across
+  // tests: the cached Future from an earlier test never resolves once this
+  // test's binding is torn down, hanging any later test that awaits it.
+  tearDown(() {
+    rootBundle.clear();
+  });
 
   testWidgets('renders every seeded buddy by name', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: FindABuddyScreen()));
@@ -16,16 +22,7 @@ void main() {
 
   testWidgets('tapping Connect shows a stub message, not an error', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: FindABuddyScreen()));
-
-    // Wait for all frames to settle, but with shorter timeout to avoid hanging
-    try {
-      await tester.pumpAndSettle(const Duration(seconds: 1));
-    } catch (_) {
-      // If pumpAndSettle times out, try pumping manually
-      for (int i = 0; i < 20; i++) {
-        await tester.pump(const Duration(milliseconds: 100));
-      }
-    }
+    await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('connect_kausar')));
     await tester.pump();

@@ -36,13 +36,7 @@ class _FindABuddyScreenState extends State<FindABuddyScreen> {
               return ListTile(
                 title: Text(buddy.name),
                 subtitle: Text('${buddy.level} · ${buddy.city}'),
-                onTap: () {
-                  try {
-                    context.go('/buddy-chat/${buddy.id}');
-                  } catch (e) {
-                    // Silently handle cases where GoRouter is not available (e.g., tests)
-                  }
-                },
+                onTap: () => context.go('/buddy-chat/${buddy.id}'),
                 trailing: TextButton(
                   key: Key('connect_${buddy.id}'),
                   onPressed: () {
