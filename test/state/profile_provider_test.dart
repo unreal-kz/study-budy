@@ -23,4 +23,11 @@ void main() {
     await reloaded.load();
     expect(reloaded.profile.name, 'Daryn');
   });
+
+  test('loaded is false before load() and true after', () async {
+    final provider = ProfileProvider(ProfileRepository());
+    expect(provider.loaded, false);
+    await provider.load();
+    expect(provider.loaded, true);
+  });
 }

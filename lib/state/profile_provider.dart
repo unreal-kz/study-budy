@@ -8,11 +8,14 @@ class ProfileProvider extends ChangeNotifier {
 
   final ProfileRepository _repository;
   Profile _profile = Profile.empty;
+  bool _loaded = false;
 
   Profile get profile => _profile;
+  bool get loaded => _loaded;
 
   Future<void> load() async {
     _profile = await _repository.load();
+    _loaded = true;
     notifyListeners();
   }
 

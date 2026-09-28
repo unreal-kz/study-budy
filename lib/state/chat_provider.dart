@@ -1,4 +1,3 @@
-// ignore_for_file: prefer_initializing_formals
 import 'package:flutter/foundation.dart';
 
 import '../data/buddy_chat_api.dart';
@@ -8,14 +7,11 @@ import 'progress_provider.dart';
 
 class ChatProvider extends ChangeNotifier {
   ChatProvider({
-    required ChatRepository repository,
-    required BuddyChatApi api,
-    required ProgressProvider progressProvider,
-    required String level,
-  })  : _repository = repository,
-        _api = api,
-        _progressProvider = progressProvider,
-        _level = level;
+    required this._repository,
+    required this._api,
+    required this._progressProvider,
+    required this._level,
+  });
 
   final ChatRepository _repository;
   final BuddyChatApi _api;
