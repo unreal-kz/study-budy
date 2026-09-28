@@ -33,25 +33,18 @@ GoRouter buildRouter(ProfileProvider profileProvider) {
       return null;
     },
     routes: [
-      // ignore: unnecessary_underscores
-      GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
+      GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingScreen()),
       ShellRoute(
         builder: (context, state, child) => AppShell(child: child),
         routes: [
-          // ignore: unnecessary_underscores
-          GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
-          // ignore: unnecessary_underscores
-          GoRoute(path: '/community', builder: (_, __) => const CommunityScreen()),
-          // ignore: unnecessary_underscores
-          GoRoute(path: '/ai-buddy', builder: (_, __) => const AiBuddyScreen()),
-          // ignore: unnecessary_underscores
-          GoRoute(path: '/progress', builder: (_, __) => const ProgressScreen()),
-          // ignore: unnecessary_underscores
-          GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
+          GoRoute(path: '/home', builder: (_, _) => const HomeScreen()),
+          GoRoute(path: '/community', builder: (_, _) => const CommunityScreen()),
+          GoRoute(path: '/ai-buddy', builder: (_, _) => const AiBuddyScreen()),
+          GoRoute(path: '/progress', builder: (_, _) => const ProgressScreen()),
+          GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen()),
         ],
       ),
-      // ignore: unnecessary_underscores
-      GoRoute(path: '/find-a-buddy', builder: (_, __) => const FindABuddyScreen()),
+      GoRoute(path: '/find-a-buddy', builder: (_, _) => const FindABuddyScreen()),
       GoRoute(
         path: '/buddy-chat/:buddyId',
         builder: (context, state) =>
