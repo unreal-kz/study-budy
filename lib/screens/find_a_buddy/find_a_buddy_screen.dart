@@ -36,7 +36,7 @@ class _FindABuddyScreenState extends State<FindABuddyScreen> {
               return ListTile(
                 title: Text(buddy.name),
                 subtitle: Text('${buddy.level} · ${buddy.city}'),
-                onTap: () => context.go('/buddy-chat/${buddy.id}'),
+                onTap: () => context.push('/buddy-chat/${buddy.id}'),
                 trailing: TextButton(
                   key: Key('connect_${buddy.id}'),
                   onPressed: () {

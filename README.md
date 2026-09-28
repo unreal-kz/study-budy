@@ -26,6 +26,8 @@ flutter run -d chrome --dart-define=BACKEND_BASE_URL=http://localhost:8000   # w
 flutter run --dart-define=BACKEND_BASE_URL=http://localhost:8000            # any connected/simulated device
 ```
 
+On Android, `localhost` refers to the device itself, not your host machine — use `http://10.0.2.2:8000` for the emulator, or your host's LAN IP for a physical device.
+
 Every screen except AI Buddy works fully offline (seeded/local data). AI Buddy needs the backend above running.
 
 ## Checks

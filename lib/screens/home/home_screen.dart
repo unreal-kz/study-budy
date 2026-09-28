@@ -25,7 +25,7 @@ class HomeScreen extends StatelessWidget {
           Text(challengeForDate(DateTime.now())),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () => context.go('/find-a-buddy'),
+            onPressed: () => context.push('/find-a-buddy'),
             child: const Text('Find a Buddy'),
           ),
         ],

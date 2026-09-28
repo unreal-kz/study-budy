@@ -63,6 +63,11 @@ class ChatProvider extends ChangeNotifier {
       );
     } on BuddyChatException catch (e) {
       _error = e.message;
+    } catch (_) {
+      // Anything else (e.g. a malformed 200 body throwing a raw TypeError
+      // out of BuddyReply.fromJson) must still surface as a visible error,
+      // not fail silently after the user's message is already shown.
+      _error = "Can't reach your practice partner right now.";
     }
     notifyListeners();
   }
