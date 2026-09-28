@@ -1,8 +1,14 @@
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.openrouter_client import OpenRouterError, RateLimitedError, get_buddy_reply
 from app.schemas import BuddyReply, ChatRequest
+
+# Loads server/.env (per the README's `cp .env.example .env` step) into the
+# process environment. Without this, OPENROUTER_API_KEY is never set even
+# when .env has a real key, since `uv run` does not auto-load .env files.
+load_dotenv()
 
 app = FastAPI(title="Study Buddy Server")
 

@@ -100,11 +100,18 @@ async def get_buddy_reply(history: list[dict], message: str, level: str) -> dict
     RateLimitedError on 429 and OpenRouterError on any other non-200 status.
     """
     payload = _build_payload(history, message, level)
-    headers = {"Authorization": f"Bearer {os.environ['OPENROUTER_API_KEY']}"}
+    try:
+        api_key = os.environ["OPENROUTER_API_KEY"]
+    except KeyError as exc:
+        raise OpenRouterError("OPENROUTER_API_KEY is not set") from exc
+    headers = {"Authorization": f"Bearer {api_key}"}
 
     for _attempt in range(2):
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(OPENROUTER_URL, json=payload, headers=headers)
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(OPENROUTER_URL, json=payload, headers=headers)
+        except httpx.RequestError as exc:
+            raise OpenRouterError(f"Couldn't reach OpenRouter: {exc}") from exc
 
         if response.status_code == 429:
             raise RateLimitedError("OpenRouter rate limit reached")

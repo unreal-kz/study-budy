@@ -2,6 +2,7 @@
 import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import httpx
 import pytest
 
 from app.openrouter_client import (
@@ -106,6 +107,24 @@ async def test_malformed_envelope_falls_back_gracefully():
     assert result["correction"] is None
     assert result["explanation"] is None
     assert isinstance(result["reply"], str) and result["reply"]
+
+
+@pytest.mark.asyncio
+async def test_missing_api_key_raises_openrouter_error(monkeypatch):
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    with pytest.raises(OpenRouterError):
+        await get_buddy_reply(history=[], message="Hi", level="B1")
+
+
+@pytest.mark.asyncio
+async def test_network_error_raises_openrouter_error():
+    mock_client = AsyncMock()
+    mock_client.__aenter__.return_value.post = AsyncMock(
+        side_effect=httpx.ConnectError("boom")
+    )
+    with patch("app.openrouter_client.httpx.AsyncClient", return_value=mock_client):
+        with pytest.raises(OpenRouterError):
+            await get_buddy_reply(history=[], message="Hi", level="B1")
 
 
 @pytest.mark.asyncio
