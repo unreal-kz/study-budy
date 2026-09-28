@@ -17,11 +17,13 @@ def _fake_api_key(monkeypatch):
     monkeypatch.setenv("OPENROUTER_API_KEY", "test-key-not-real")
 
 
-def _fake_response(status_code: int, content: str | None = None, text: str = ""):
+def _fake_response(status_code: int, content: str | None = None, text: str = "", json_body: dict | None = None):
     response = MagicMock()
     response.status_code = status_code
     response.text = text
-    if content is not None:
+    if json_body is not None:
+        response.json.return_value = json_body
+    elif content is not None:
         response.json.return_value = {
             "choices": [{"message": {"content": content}}]
         }
@@ -90,3 +92,34 @@ async def test_other_error_status_raises_openrouter_error():
     with patch("app.openrouter_client.httpx.AsyncClient", return_value=mock_client):
         with pytest.raises(OpenRouterError):
             await get_buddy_reply(history=[], message="Hi", level="B1")
+
+
+@pytest.mark.asyncio
+async def test_malformed_envelope_falls_back_gracefully():
+    # Empty choices list (malformed envelope, not malformed JSON content)
+    mock_client = AsyncMock()
+    mock_client.__aenter__.return_value.post = AsyncMock(
+        return_value=_fake_response(200, json_body={"choices": []})
+    )
+    with patch("app.openrouter_client.httpx.AsyncClient", return_value=mock_client):
+        result = await get_buddy_reply(history=[], message="Hi", level="B1")
+    assert result["correction"] is None
+    assert result["explanation"] is None
+    assert isinstance(result["reply"], str) and result["reply"]
+
+
+@pytest.mark.asyncio
+async def test_wrong_typed_optional_fields_falls_back_gracefully():
+    # Wrong types for optional fields (should be str | None, not int or list)
+    wrong_types = json.dumps(
+        {"reply": "hi", "correction": 123, "explanation": ["a", "b"]}
+    )
+    mock_client = AsyncMock()
+    mock_client.__aenter__.return_value.post = AsyncMock(
+        return_value=_fake_response(200, wrong_types)
+    )
+    with patch("app.openrouter_client.httpx.AsyncClient", return_value=mock_client):
+        result = await get_buddy_reply(history=[], message="Hi", level="B1")
+    assert result["correction"] is None
+    assert result["explanation"] is None
+    assert isinstance(result["reply"], str) and result["reply"]

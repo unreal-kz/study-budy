@@ -66,6 +66,13 @@ def _build_payload(history: list[dict], message: str, level: str) -> dict:
     }
 
 
+def _extract_content(response: httpx.Response) -> str | None:
+    try:
+        return response.json()["choices"][0]["message"]["content"]
+    except (KeyError, IndexError, TypeError, json.JSONDecodeError):
+        return None
+
+
 def _try_parse_json(content: str) -> dict | None:
     try:
         return json.loads(content)
@@ -74,7 +81,15 @@ def _try_parse_json(content: str) -> dict | None:
 
 
 def _is_valid_buddy_reply(parsed: object) -> bool:
-    return isinstance(parsed, dict) and isinstance(parsed.get("reply"), str)
+    if not isinstance(parsed, dict):
+        return False
+    if not isinstance(parsed.get("reply"), str):
+        return False
+    if parsed.get("correction") is not None and not isinstance(parsed.get("correction"), str):
+        return False
+    if parsed.get("explanation") is not None and not isinstance(parsed.get("explanation"), str):
+        return False
+    return True
 
 
 async def get_buddy_reply(history: list[dict], message: str, level: str) -> dict:
@@ -98,8 +113,8 @@ async def get_buddy_reply(history: list[dict], message: str, level: str) -> dict
                 f"OpenRouter returned {response.status_code}: {response.text}"
             )
 
-        content = response.json()["choices"][0]["message"]["content"]
-        parsed = _try_parse_json(content)
+        content = _extract_content(response)
+        parsed = _try_parse_json(content) if content is not None else None
         if parsed is not None and _is_valid_buddy_reply(parsed):
             return parsed
 
