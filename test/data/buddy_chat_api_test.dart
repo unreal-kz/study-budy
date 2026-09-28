@@ -52,4 +52,34 @@ void main() {
       throwsA(isA<BuddyChatException>()),
     );
   });
+
+  test('sendMessage sends X-App-Token header when appToken is set', () async {
+    final mockClient = MockClient((request) async {
+      expect(request.headers['X-App-Token'], 'my-secret');
+      return http.Response(
+        jsonEncode({'reply': 'ok', 'correction': null, 'explanation': null}),
+        200,
+      );
+    });
+
+    final api = BuddyChatApi(
+      baseUrl: 'http://localhost:8000',
+      appToken: 'my-secret',
+      client: mockClient,
+    );
+    await api.sendMessage(history: const [], message: 'Hi', level: 'B1');
+  });
+
+  test('sendMessage omits X-App-Token header when appToken is empty', () async {
+    final mockClient = MockClient((request) async {
+      expect(request.headers.containsKey('X-App-Token'), isFalse);
+      return http.Response(
+        jsonEncode({'reply': 'ok', 'correction': null, 'explanation': null}),
+        200,
+      );
+    });
+
+    final api = BuddyChatApi(baseUrl: 'http://localhost:8000', client: mockClient);
+    await api.sendMessage(history: const [], message: 'Hi', level: 'B1');
+  });
 }

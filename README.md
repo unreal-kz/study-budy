@@ -30,6 +30,16 @@ On Android, `localhost` refers to the device itself, not your host machine — u
 
 Every screen except AI Buddy works fully offline (seeded/local data). AI Buddy needs the backend above running.
 
+#### Protecting a public deployment
+
+By default `/buddy/chat` has no auth and CORS allows any `localhost`/`127.0.0.1` origin — fine for local dev. Before exposing the backend publicly, set `APP_TOKEN` and `ALLOWED_ORIGINS` in `server/.env` (see `server/.env.example`), then build the app with the matching token:
+
+```sh
+flutter run -d chrome --dart-define=BACKEND_BASE_URL=https://your-host --dart-define=APP_TOKEN=your-shared-token
+```
+
+`APP_TOKEN` is not a real secret (it ships inside the built app) — it only stops random traffic from burning the OpenRouter daily quota.
+
 ## Checks
 
 ```sh

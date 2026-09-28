@@ -28,10 +28,11 @@ class BuddyChatException implements Exception {
 }
 
 class BuddyChatApi {
-  BuddyChatApi({required this.baseUrl, http.Client? client})
+  BuddyChatApi({required this.baseUrl, this.appToken = '', http.Client? client})
       : _client = client ?? http.Client();
 
   final String baseUrl;
+  final String appToken;
   final http.Client _client;
 
   Future<BuddyReply> sendMessage({
@@ -55,7 +56,10 @@ class BuddyChatApi {
       response = await _client
           .post(
             Uri.parse('$baseUrl/buddy/chat'),
-            headers: const {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              if (appToken.isNotEmpty) 'X-App-Token': appToken,
+            },
             body: body,
           )
           .timeout(const Duration(seconds: 30));

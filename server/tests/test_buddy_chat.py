@@ -49,3 +49,53 @@ def test_buddy_chat_upstream_error_returns_502(monkeypatch):
         "/buddy/chat", json={"history": [], "message": "Hi", "level": "B1"}
     )
     assert response.status_code == 502
+
+
+def test_buddy_chat_no_app_token_configured_allows_request(monkeypatch):
+    monkeypatch.delenv("APP_TOKEN", raising=False)
+
+    async def fake_get_buddy_reply(history, message, level):
+        return {"reply": "ok", "correction": None, "explanation": None}
+
+    monkeypatch.setattr("app.main.get_buddy_reply", fake_get_buddy_reply)
+
+    response = client.post(
+        "/buddy/chat", json={"history": [], "message": "Hi", "level": "B1"}
+    )
+    assert response.status_code == 200
+
+
+def test_buddy_chat_rejects_missing_token_when_configured(monkeypatch):
+    monkeypatch.setenv("APP_TOKEN", "secret-token")
+
+    response = client.post(
+        "/buddy/chat", json={"history": [], "message": "Hi", "level": "B1"}
+    )
+    assert response.status_code == 401
+
+
+def test_buddy_chat_rejects_wrong_token_when_configured(monkeypatch):
+    monkeypatch.setenv("APP_TOKEN", "secret-token")
+
+    response = client.post(
+        "/buddy/chat",
+        json={"history": [], "message": "Hi", "level": "B1"},
+        headers={"X-App-Token": "wrong-token"},
+    )
+    assert response.status_code == 401
+
+
+def test_buddy_chat_accepts_matching_token_when_configured(monkeypatch):
+    monkeypatch.setenv("APP_TOKEN", "secret-token")
+
+    async def fake_get_buddy_reply(history, message, level):
+        return {"reply": "ok", "correction": None, "explanation": None}
+
+    monkeypatch.setattr("app.main.get_buddy_reply", fake_get_buddy_reply)
+
+    response = client.post(
+        "/buddy/chat",
+        json={"history": [], "message": "Hi", "level": "B1"},
+        headers={"X-App-Token": "secret-token"},
+    )
+    assert response.status_code == 200
