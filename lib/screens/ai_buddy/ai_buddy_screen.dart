@@ -59,6 +59,22 @@ class _AiBuddyScreenState extends State<AiBuddyScreen> {
       ),
       body: Column(
         children: [
+          if (chat.isSending)
+            Column(
+              children: [
+                const LinearProgressIndicator(key: Key('ai_buddy_sending')),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  child: Text(
+                    'Waking up your buddy — the first reply can take up to a minute.',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: AppColors.neutral500),
+                  ),
+                ),
+              ],
+            ),
           if (chat.error != null)
             Container(
               key: const Key('ai_buddy_error'),
@@ -102,12 +118,14 @@ class _AiBuddyScreenState extends State<AiBuddyScreen> {
                   child: IconButton(
                     key: const Key('ai_buddy_send'),
                     icon: Icon(isFeedback ? Icons.spellcheck : Icons.mic, color: Colors.white),
-                    onPressed: () {
-                      final text = _controller.text.trim();
-                      if (text.isEmpty) return;
-                      _controller.clear();
-                      context.read<ChatProvider>().sendMessage(text);
-                    },
+                    onPressed: chat.isSending
+                        ? null
+                        : () {
+                            final text = _controller.text.trim();
+                            if (text.isEmpty) return;
+                            _controller.clear();
+                            context.read<ChatProvider>().sendMessage(text);
+                          },
                   ),
                 ),
               ],

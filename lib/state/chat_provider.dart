@@ -20,9 +20,11 @@ class ChatProvider extends ChangeNotifier {
 
   List<ChatMessage> _messages = const [];
   String? _error;
+  bool _isSending = false;
 
   List<ChatMessage> get messages => _messages;
   String? get error => _error;
+  bool get isSending => _isSending;
 
   Future<void> load() async {
     _messages = await _repository.loadAll();
@@ -30,7 +32,13 @@ class ChatProvider extends ChangeNotifier {
   }
 
   Future<void> sendMessage(String text) async {
+    // A reply already in flight (likely a Render cold start, up to ~90s) -
+    // ignore a second tap rather than firing a parallel request.
+    if (_isSending) return;
+
     _error = null;
+    _isSending = true;
+    notifyListeners();
     final userMessage = ChatMessage(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
       sender: 'user',
@@ -69,6 +77,7 @@ class ChatProvider extends ChangeNotifier {
       // not fail silently after the user's message is already shown.
       _error = "Can't reach your practice partner right now.";
     }
+    _isSending = false;
     notifyListeners();
   }
 }
