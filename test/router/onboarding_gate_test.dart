@@ -4,8 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:study_budy/data/profile_repository.dart';
+import 'package:study_budy/data/progress_repository.dart';
 import 'package:study_budy/router/app_router.dart';
 import 'package:study_budy/state/profile_provider.dart';
+import 'package:study_budy/state/progress_provider.dart';
 
 void main() {
   setUp(() {
@@ -30,10 +32,15 @@ void main() {
   testWidgets('shows Home once onboarding completes', (tester) async {
     final profileProvider = ProfileProvider(ProfileRepository());
     await profileProvider.load();
+    final progressProvider = ProgressProvider(ProgressRepository());
+    await progressProvider.load();
 
     await tester.pumpWidget(
-      ChangeNotifierProvider.value(
-        value: profileProvider,
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: profileProvider),
+          ChangeNotifierProvider.value(value: progressProvider),
+        ],
         child: MaterialApp.router(routerConfig: buildRouter(profileProvider)),
       ),
     );
