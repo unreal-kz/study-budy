@@ -54,6 +54,22 @@ Prod also sets `REQUIRE_APP_TOKEN=1` (`render.yaml`), so a startup with `APP_TOK
 
 Free tier spins down after 15 min idle; the first request after that takes 30-60s (cold start).
 
+### iOS beta (TestFlight)
+
+Bundle ID `kz.unreal.studybuddy`, distributed to testers as TestFlight internal builds (no Beta App Review). One-time setup, none of it repo-tracked:
+
+- App Store Connect API key (role Admin) at `~/.appstoreconnect/private_keys/AuthKey_<KEY_ID>.p8`.
+- `.env.appstore` in the repo root (gitignored) with `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_TEAM_ID`.
+- `.app_token.txt` in the repo root (gitignored), the same value as `APP_TOKEN` on Render.
+- The app record created by hand in App Store Connect (`POST /v1/apps` is not supported by the API); testers added as App Store Connect users with role Marketing, then to an internal TestFlight group.
+
+```sh
+scripts/ios_testflight.sh            # archive + export IPA to build/ios/testflight/ipa
+scripts/ios_testflight.sh --upload   # ... and upload to App Store Connect
+```
+
+The build number is `git rev-list --count HEAD`, so it grows with every commit and never repeats. Builds expire in TestFlight after 90 days. Like the APK, the IPA carries `APP_TOKEN` (see above).
+
 ## Checks
 
 ```sh
