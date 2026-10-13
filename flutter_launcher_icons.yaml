@@ -1,0 +1,26 @@
+# Platform icon sets are generated from the renders in design/brand/png/.
+# Regenerate the PNGs:  python3 scripts/brand/build_brand_assets.py
+# Then the icon sets:   dart run flutter_launcher_icons
+flutter_launcher_icons:
+  image_path: "design/brand/png/app_icon_1024.png"
+
+  ios: true
+  # App Store rejects icons with an alpha channel.
+  remove_alpha_ios: true
+  background_color_ios: "#FCF3EF"
+  image_path_ios_dark_transparent: "design/brand/png/app_icon_dark_1024.png"
+  image_path_ios_tinted_grayscale: "design/brand/png/app_icon_tinted_1024.png"
+  desaturate_tinted_to_grayscale_ios: true
+
+  android: true
+  # Legacy (pre-API 26) PNGs are generated for min_sdk_android < 26.
+  min_sdk_android: 21
+  adaptive_icon_background: "#FCF3EF"
+  adaptive_icon_foreground: "design/brand/png/app_icon_foreground_1024.png"
+  adaptive_icon_monochrome: "design/brand/png/app_icon_monochrome_1024.png"
+
+  web:
+    generate: true
+    image_path: "design/brand/png/app_icon_1024.png"
+    background_color: "#FCF3EF"
+    theme_color: "#1B3A33"
