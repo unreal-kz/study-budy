@@ -102,7 +102,13 @@ async def health() -> dict[str, str]:
 async def buddy_chat(request: ChatRequest) -> BuddyReply:
     history = [m.model_dump() for m in request.history]
     try:
-        reply = await get_buddy_reply(history, request.message, request.level)
+        reply = await get_buddy_reply(
+            history,
+            request.message,
+            request.level,
+            mode=request.mode,
+            topic=request.topic,
+        )
     except RateLimitedError:
         raise HTTPException(
             status_code=429,
