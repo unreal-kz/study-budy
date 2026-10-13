@@ -1,11 +1,11 @@
 {
-    "name": "study_budy",
-    "short_name": "study_budy",
+    "name": "Study Buddy",
+    "short_name": "Study Buddy",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#FCF3EF",
+    "theme_color": "#1B3A33",
+    "description": "Speak. Connect. Grow. Practise English with real people and an AI buddy.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

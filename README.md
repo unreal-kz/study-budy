@@ -70,6 +70,20 @@ scripts/ios_testflight.sh --upload   # ... and upload to App Store Connect
 
 The build number is `git rev-list --count HEAD`, so it grows with every commit and never repeats. Builds expire in TestFlight after 90 days. Like the APK, the IPA carries `APP_TOKEN` (see above).
 
+### Brand assets (app icon, launch screen, in-app logo)
+
+The mark (two speech bubbles + sparks, from Daryn's mockups) has a single source: the geometry and palettes in `scripts/brand/build_brand_assets.py`. Colours come from `AppColors` in `lib/theme/app_theme.dart`.
+
+```sh
+python3 scripts/brand/build_brand_assets.py   # SVGs -> design/brand/, PNGs via headless Chrome
+scripts/brand/generate_icons.sh               # PNGs -> iOS / Android / web icon sets (flutter_launcher_icons.yaml)
+```
+
+- Outputs: `design/brand/*.svg` (sources, not bundled), `design/brand/png/*`, `assets/brand/` (in-app `BrandLogo`), `LaunchImage.imageset` (iOS launch), `drawable-nodpi/launch_logo.png` (Android launch).
+- iOS gets light, dark and tinted (iOS 18+) icons; the 1024 marketing icon must have no alpha (`remove_alpha_ios`). Android gets adaptive + monochrome (themed) icons.
+- Use `generate_icons.sh`, not `dart run flutter_launcher_icons` directly: the plugin (0.14.4) corrupts `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS` in `project.pbxproj` and the script puts the file back.
+- Rendering needs Google Chrome at `/Applications/Google Chrome.app`.
+
 ## Checks
 
 ```sh
