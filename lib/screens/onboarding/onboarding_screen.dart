@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../state/profile_provider.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/brand_logo.dart';
 import '../../widgets/initial_avatar.dart';
 
 const levelLabels = {
@@ -45,20 +46,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      Container(
-                        width: 72,
-                        height: 72,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: AppColors.pine800,
-                          borderRadius: BorderRadius.circular(22),
-                        ),
-                        child: Text(
-                          'SB',
-                          style: textTheme.headlineSmall?.copyWith(color: AppColors.cream50),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
+                      const BrandLogo(size: 96),
+                      const SizedBox(height: 12),
                       Text('Study Buddy', style: textTheme.headlineLarge, textAlign: TextAlign.center),
                       const SizedBox(height: 8),
                       Text(
