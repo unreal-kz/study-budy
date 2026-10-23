@@ -3,52 +3,33 @@ import os
 
 import httpx
 
+from app.llm_errors import LLMError, RateLimitedError
+from app.prompts import (  # noqa: F401 - re-exported: tests import these from here
+    BUDDY_REPLY_SCHEMA,
+    IELTS_INSTRUCTION,
+    SYSTEM_PROMPT_TEMPLATE,
+    TOPIC_INSTRUCTION_NO_TOPIC,
+    TOPIC_INSTRUCTION_TEMPLATE,
+    fallback_reply,
+)
+from app.prompts import build_system_prompt as _build_system_prompt
+
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 MODEL = "nvidia/nemotron-3-super-120b-a12b:free"
 
-BUDDY_REPLY_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "reply": {
-            "type": "string",
-            "description": "Conversational reply continuing the practice conversation",
-        },
-        "correction": {
-            "type": ["string", "null"],
-            "description": (
-                "Corrected version of the user's message if it has a "
-                "grammar mistake, otherwise null"
-            ),
-        },
-        "explanation": {
-            "type": ["string", "null"],
-            "description": "Brief explanation of the correction, otherwise null",
-        },
-    },
-    "required": ["reply", "correction", "explanation"],
-    "additionalProperties": False,
-}
-
-SYSTEM_PROMPT_TEMPLATE = (
-    "You are a friendly English-speaking practice partner for a student in "
-    "Kazakhstan at CEFR level {level}. Keep the conversation going naturally "
-    "on whatever topic the student raises. If their message has a grammar "
-    "mistake, also provide a corrected version and a short explanation; if "
-    "there is no mistake, set correction and explanation to null."
-)
+# Kept under the old name: callers and tests import it from this module.
+OpenRouterError = LLMError
 
 
-class OpenRouterError(Exception):
-    """Raised when OpenRouter can't be reached or returns an error status."""
-
-
-class RateLimitedError(OpenRouterError):
-    """Raised when OpenRouter returns 429 (free-tier rate limit)."""
-
-
-def _build_payload(history: list[dict], message: str, level: str) -> dict:
+def _build_payload(
+    history: list[dict],
+    message: str,
+    level: str,
+    mode: str | None = None,
+    topic: str | None = None,
+) -> dict:
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT_TEMPLATE.format(level=level)}
+        {"role": "system", "content": _build_system_prompt(level, mode, topic)}
     ]
     messages.extend(history)
     messages.append({"role": "user", "content": message})
@@ -92,14 +73,23 @@ def _is_valid_buddy_reply(parsed: object) -> bool:
     return True
 
 
-async def get_buddy_reply(history: list[dict], message: str, level: str) -> dict:
+async def get_buddy_reply(
+    history: list[dict],
+    message: str,
+    level: str,
+    mode: str | None = None,
+    topic: str | None = None,
+) -> dict:
     """Call OpenRouter for a buddy reply.
+
+    ``mode`` ("free" | "topic" | "ielts") and ``topic`` are optional; with
+    ``mode`` None or "free" the system prompt is the same as before modes.
 
     Retries once on a malformed/non-schema JSON body, then falls back to a
     plain-text reply with correction/explanation set to null. Raises
     RateLimitedError on 429 and OpenRouterError on any other non-200 status.
     """
-    payload = _build_payload(history, message, level)
+    payload = _build_payload(history, message, level, mode, topic)
     try:
         api_key = os.environ["OPENROUTER_API_KEY"]
     except KeyError as exc:
@@ -125,8 +115,4 @@ async def get_buddy_reply(history: list[dict], message: str, level: str) -> dict
         if parsed is not None and _is_valid_buddy_reply(parsed):
             return parsed
 
-    return {
-        "reply": "Let's keep practicing! (I couldn't format that reply properly.)",
-        "correction": None,
-        "explanation": None,
-    }
+    return fallback_reply()

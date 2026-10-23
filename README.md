@@ -18,6 +18,8 @@ cp .env.example .env   # then fill in your real OPENROUTER_API_KEY
 uv run uvicorn app.main:app --reload --port 8000
 ```
 
+By default the backend asks OpenRouter's free model. To use Claude instead, set `LLM_PROVIDER=anthropic` and `ANTHROPIC_API_KEY` in `server/.env` (ST-65, `docs/adr/0003-claude-llm-provider.md`). Startup fails if the key is missing, and the API is billed per token, so set a spend limit on the key's workspace in the Anthropic Console first. Each call logs its token usage (`Anthropic reply … input_tokens=… output_tokens=…`).
+
 ### App
 
 ```sh
@@ -38,7 +40,7 @@ By default `/buddy/chat` has no auth and CORS allows any `localhost`/`127.0.0.1`
 flutter run -d chrome --dart-define=BACKEND_BASE_URL=https://your-host --dart-define=APP_TOKEN=your-shared-token
 ```
 
-`APP_TOKEN` is not a real secret (it ships inside the built app) — it only stops random traffic from burning the OpenRouter daily quota.
+`APP_TOKEN` is not a real secret (it ships inside the built app) — it only stops random traffic from burning the OpenRouter daily quota. With `LLM_PROVIDER=anthropic` that traffic costs real money, so also keep a spend limit on the Anthropic workspace.
 
 ### Deploy (Render)
 

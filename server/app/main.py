@@ -1,3 +1,4 @@
+import logging
 import os
 from collections.abc import Mapping
 
@@ -5,13 +6,18 @@ from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.openrouter_client import OpenRouterError, RateLimitedError, get_buddy_reply
+from app.llm import get_buddy_reply, validate_llm_config
+from app.llm_errors import LLMError, RateLimitedError
 from app.schemas import BuddyReply, ChatRequest
 
 # Loads server/.env (per the README's `cp .env.example .env` step) into the
 # process environment. Without this, OPENROUTER_API_KEY is never set even
 # when .env has a real key, since `uv run` does not auto-load .env files.
 load_dotenv()
+
+# Gives the app.* loggers (provider errors, per-call token usage) a handler;
+# uvicorn only configures its own loggers.
+logging.basicConfig(level=logging.INFO)
 
 _TRUTHY = {"1", "true", "yes", "on"}
 _FALSY = {"", "0", "false", "no", "off"}
@@ -61,6 +67,7 @@ def validate_app_token_config(env: Mapping[str, str]) -> None:
 
 
 validate_app_token_config(os.environ)
+validate_llm_config(os.environ)
 
 app = FastAPI(title="Study Buddy Server")
 
@@ -102,13 +109,19 @@ async def health() -> dict[str, str]:
 async def buddy_chat(request: ChatRequest) -> BuddyReply:
     history = [m.model_dump() for m in request.history]
     try:
-        reply = await get_buddy_reply(history, request.message, request.level)
+        reply = await get_buddy_reply(
+            history,
+            request.message,
+            request.level,
+            mode=request.mode,
+            topic=request.topic,
+        )
     except RateLimitedError:
         raise HTTPException(
             status_code=429,
             detail="Daily practice limit reached, try again tomorrow.",
         )
-    except OpenRouterError:
+    except LLMError:
         raise HTTPException(
             status_code=502,
             detail="Couldn't reach your practice partner right now.",
